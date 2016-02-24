@@ -1,4 +1,38 @@
 require 'socket'               # Get sockets from stdlib
+require 'json'
+require 'pp'
+
+def process_post(request, client)
+  params = {}
+  print request
+  while request != ""
+    request = client.gets
+    print request
+    command, data = request.split(':')
+    if command == "Content-Length"
+        data_length = data.to_i
+        request = client.gets  #consume blank line
+        request = client.read(data_length)
+        params = JSON.parse(request)
+        break
+    end
+  end
+  text = File.read("thanks.html")
+  first,last = text.split("<%= yield %>")
+  replacement = ""
+  params.each do |key, value|
+    value.each do |key2, value2|
+      puts "key = #{key2} value = #{value2}"
+      replacement = replacement + "<li>#{key2}: #{value2}</li>"
+    end
+  end
+  output = first + replacement + last
+  client.puts("HTTP/1.0 200 OK")
+  client.puts("Content-Type: text/html")
+  client.puts("Content-Length: #{output.length}")
+  client.puts("")
+  client.puts(output)
+end
 
 def process_get(file, client)
   file = "." + file
@@ -30,6 +64,8 @@ loop {                         # Servers run forever
   case match[1] 
     when 'GET'
       process_get(match[2], client)
+    when 'POST'
+      process_post(request,client)
     else
   end
   client.close                 # Disconnect from the client
