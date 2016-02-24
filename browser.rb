@@ -1,5 +1,4 @@
 require 'socket'
-require 'pp'
 require 'json'
 
 def process_post()
@@ -53,7 +52,3 @@ case match[2]
   else
     puts match[3]
 end
-
-#pp header_lines
-#print headers
-#print body                          # And display it

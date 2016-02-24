@@ -4,10 +4,8 @@ require 'pp'
 
 def process_post(request, client)
   params = {}
-  print request
   while request != ""
     request = client.gets
-    print request
     command, data = request.split(':')
     if command == "Content-Length"
         data_length = data.to_i
@@ -22,7 +20,6 @@ def process_post(request, client)
   replacement = ""
   params.each do |key, value|
     value.each do |key2, value2|
-      puts "key = #{key2} value = #{value2}"
       replacement = replacement + "<li>#{key2}: #{value2}</li>"
     end
   end
@@ -58,9 +55,7 @@ loop {                         # Servers run forever
  #client.puts "Closing the connection. Bye!"
   request = client.gets
   print "request = #{request}"
-  match = /(\w+)\s(\/\w+.\w+)\s(\w+\/\d+.\d+)/.match(request)
-  #puts match[1]
-  #puts match[2]
+  match = /(\w+)\s(\/\w+.\w+)\s(\w+\/\d+.\d+)/.match(request) #This matches the first header line 
   case match[1] 
     when 'GET'
       process_get(match[2], client)
